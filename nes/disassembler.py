@@ -1,6 +1,3 @@
-from opcode import *
-
-
 class NESDisassembler(object):
 
     def __init__(self):
@@ -31,6 +28,9 @@ class NESDisassembler(object):
             if self.firstbyte_secondnib == 0xA:
                 self.arithmetic_shift_left_accumulator()
                 self.pc += 1
+            elif self.firstbyte_secondnib == 0x0:
+                self.break_interrupt()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0x6:
                 self.arithmetic_shift_left_z()
                 self.pc += 2
@@ -39,20 +39,25 @@ class NESDisassembler(object):
                 self.pc += 3
             else:
                 print("0 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    0 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    0 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x1:
             if self.firstbyte_secondnib == 0x6:
                 self.arithmetic_shift_left_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x0:
+                self.branch_on_plus()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0xE:
                 self.arithmetic_shift_left_a_x()
                 self.pc += 3
             else:
                 print("1 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    1 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    1 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x2:
             if self.firstbyte_secondnib == 0x9:
@@ -75,12 +80,16 @@ class NESDisassembler(object):
                 self.pc += 2
             else:
                 print("2 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    2 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    2 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x3:
             if self.firstbyte_secondnib == 0x5:
                 self.and_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x0:
+                self.branch_on_minus()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0xD:
                 self.and_a_x()
@@ -93,18 +102,25 @@ class NESDisassembler(object):
                 self.pc += 2
             else:
                 print("3 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    3 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    3 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x4:
             print("4 not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}    4 not handled yet.".format(
-                self.pc, self.firstbyte, self.secondbyte))
+            self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                 "    4 not handled yet.".format(
+                                     self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0x5:
-            print("5 not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}    5 not handled yet.".format(
-                self.pc, self.firstbyte, self.secondbyte))
+            if self.firstbyte_secondnib == 0x0:
+                self.branch_on_overflow_clear()
+                self.pc += 2
+            else:
+                print("5 not handled yet.")
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    5 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0x6:
             if self.firstbyte_secondnib == 0x9:
@@ -121,12 +137,16 @@ class NESDisassembler(object):
                 self.pc += 3
             else:
                 print("6 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    6 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    6 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x7:
             if self.firstbyte_secondnib == 0x5:
                 self.add_with_carry_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x0:
+                self.branch_on_overflow_set()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0x1:
                 self.add_with_carry_I_x()
@@ -139,8 +159,9 @@ class NESDisassembler(object):
                 self.pc += 3
             else:
                 print("7 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    7 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    7 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x8:
             if self.firstbyte_secondnib == 0x5:
@@ -169,12 +190,16 @@ class NESDisassembler(object):
                 self.pc += 1
             else:
                 print("8 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    8 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    8 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x9:
             if self.firstbyte_secondnib == 0x5:
                 self.stA_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x0:
+                self.branch_on_carry_clear()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0xD:
                 self.stA_a_x()
@@ -199,8 +224,9 @@ class NESDisassembler(object):
                 self.pc += 1
             else:
                 print("9 not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    9 not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    9 not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0xA:
             if self.firstbyte_secondnib == 0x9:
@@ -241,13 +267,17 @@ class NESDisassembler(object):
                 self.pc += 1
             else:
                 print("A not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    A not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    A not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
 
         if self.firstbyte_firstnib == 0xB:
             if self.firstbyte_secondnib == 0x5:
                 self.ldA_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x0:
+                self.branch_on_carry_set()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0xD:
                 self.ldA_a_x()
@@ -275,37 +305,138 @@ class NESDisassembler(object):
                 self.pc += 1
             else:
                 print("B not handled yet.")
-                self.dumplist.append("{:04X}  {:02X}{:02X}    B not handled yet.".format(
-                    self.pc, self.firstbyte, self.secondbyte))
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    B not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0xC:
             print("C not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}    C not handled yet.".format(
-                self.pc, self.firstbyte, self.secondbyte))
+            self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                 "    C not handled yet.".format(
+                                     self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0xD:
-            print("D not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}    D not handled yet.".format(
-                self.pc, self.firstbyte, self.secondbyte))
+            if self.firstbyte_secondnib == 0x0:
+                self.branch_on_not_equal()
+                self.pc += 2
+            else:
+                print("D not handled yet.")
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    D not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0xE:
             print("E not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}    E not handled yet.".format(
-                self.pc, self.firstbyte, self.secondbyte))
+            self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                 "    E not handled yet.".format(
+                                     self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0xF:
-            print("F not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}    F not handled yet.".format(
-                self.pc, self.firstbyte, self.secondbyte))
+            if self.firstbyte_secondnib == 0x0:
+                self.branch_on_equal()
+                self.pc += 2
+            else:
+                print("F not handled yet.")
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                     "    F not handled yet.".format(
+                                         self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
+
+    def compare_accumulator_a(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  CMP_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  CMP_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def compare_accumulator_z_x(self):
+        print("{:04X}  {:02X}{:02X}  CMP_z_x:   {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}  CMP_z_x:   {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_accumulator_z(self):
+        print("{:04X}  {:02X}{:02X}    CMP_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    CMP_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_accumulator_i(self):
+        print("{:04X}  {:02X}{:02X}    CMP_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    CMP_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def break_interrupt(self):
+        print("{:04}  {:02X}      BRK".format(self.pc, self.firstbyte))
+        self.dumplist.append(
+            "{:04}  {:02X}      BRK".format(self.pc, self.firstbyte))
+
+    def branch_on_equal(self):
+        print("{:04X}  {:02X}{:02X}    BEQ:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BEQ:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def branch_on_not_equal(self):
+        print("{:04X}  {:02X}{:02X}    BNE:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BNE:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def branch_on_carry_set(self):
+        print("{:04X}  {:02X}{:02X}    BCS:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BCS:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def branch_on_carry_clear(self):
+        print("{:04X}  {:02X}{:02X}    BCC:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BCC:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def branch_on_overflow_set(self):
+        print("{:04X}  {:02X}{:02X}    BVS:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BVS:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def branch_on_overflow_clear(self):
+        print("{:04X}  {:02X}{:02X}    BVC:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BVC:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def branch_on_minus(self):
+        print("{:04X}  {:02X}{:02X}    BMI:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BMI:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def branch_on_plus(self):
+        print("{:04X}  {:02X}{:02X}    BPL:     {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append(
+            "{:04X}  {:02X}{:02X}    BPL:     {:02X}".format(
+                self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def bit_a(self):
         print("{:04X}  {:02X}{:02X}{:02X}  BIT_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  BIT_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  BIT_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def bit_z(self):
         print("{:04X}  {:02X}{:02X}    BIT_z:   {:02X}".format(
@@ -317,23 +448,26 @@ class NESDisassembler(object):
         print("{:04X}  {:02X}{:02X}{:02X}  ASL_a_x: {:02X}{:02X}, X".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  ASL_a_x: {:02X}{:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  ASL_a_x: {:02X}{:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def arithmetic_shift_left_a(self):
         print("{:04X}  {:02X}{:02X}{:02X}  ASL_a:  {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  ASL_a:  {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  ASL_a:  {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def arithmetic_shift_left_z_x(self):
         print("{:04X}  {:02X}{:02X}    ASL_z_x: {:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    ASL_z_x: {:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    ASL_z_x: {:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def arithmetic_shift_left_z(self):
         print("{:04X}  {:02X}{:02X}    ASL_z:   {:02X}".format(
@@ -362,86 +496,98 @@ class NESDisassembler(object):
     def and_z_x(self):
         print("{:04X}  {:02X}{:02X}  AND_z_x:   {:02X}, X".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}  AND_z_x:   {:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "  AND_z_x:   {:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def and_a(self):
         print("{:04X}  {:02X}{:02X}{:02X}  AND_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  AND_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  AND_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def and_a_x(self):
         print("{:04X}  {:02X}{:02X}{:02X}  AND_a_x: {:02X}{:02X}, X".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  AND_a_x: {:02X}{:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  AND_a_x: {:02X}{:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def and_a_y(self):
         print("{:04X}  {:02X}{:02X}{:02X}  AND_a_y: {:02X}{:02X}, Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  AND_a_y: {:02X}{:02X}, Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  AND_a_y: {:02X}{:02X}, Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def and_I_x(self):
         print("{:04X}  {:02X}{:02X}    AND_I_x: ({:02X}, X)".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    AND_I_x: ({:02X}, X)".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    AND_I_x: ({:02X}, X)".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def and_I_y(self):
         print("{:04X}  {:02X}{:02X}    AND_I_y: ({:02X}), Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    AND_I_y: ({:02X}), Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    AND_I_y: ({:02X}), Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def add_with_carry_I_y(self):
         print("{:04X}  {:02X}{:02X}    ADC_I_y:   ({:02X}), Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    ADC_I_y:   ({:02X}), Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    ADC_I_y:   ({:02X}), Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def add_with_carry_I_x(self):
         print("{:04X}  {:02X}{:02X}  ADC_I_x: ({:02X}, X)".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    ADC_I_x: ({:02X}, X)".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    ADC_I_x: ({:02X}, X)".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def add_with_carry_a_y(self):
         print("{:04X}  {:02X}{:02X}{:02X}  ADC_a_y: {:02X}{:02X}, Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  ADC_a_y: {:02X}{:02X}, Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  ADC_a_y: {:02X}{:02X}, Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def add_with_carry_a_x(self):
         print("{:04X}  {:02X}{:02X}{:02X}  ADC_a_x: {:02X}{:02X}, X".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  ADC_a_x: {:02X}{:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  ADC_a_x: {:02X}{:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def add_with_carry_a(self):
         print("{:04X}  {:02X}{:02X}{:02X}  ADC_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  ADC_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  ADC_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def add_with_carry_z_x(self):
         print("{:04X}  {:02X}{:02X}  ADC_z_x:   {:02X}, X".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    ADC_z_x:   {:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    ADC_z_x:   {:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def add_with_carry_z(self):
         print("{:04X}  {:02X}{:02X}  ADC_z:   {:02X}".format(
@@ -495,15 +641,17 @@ class NESDisassembler(object):
         print("{:04X}  {:02X}{:02X}{:02X}  STY_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  STY_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  STY_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def stY_z_x(self):
         print("{:04X}  {:02X}{:02X}  STY_z_x:   {:02X}, Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    STY_z_x:   {:02X}, Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X} "
+                             "   STY_z_x:   {:02X}, Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def stY_z(self):
         print("{:04X}  {:02X}{:02X}  STY_z:   {:02X}".format(
@@ -515,15 +663,17 @@ class NESDisassembler(object):
         print("{:04X}  {:02X}{:02X}{:02X}  STX_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  STX_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  STX_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def stX_z_y(self):
         print("{:04X}  {:02X}{:02X}  STX_z_y:   {:02X}, Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    STX_z_y:   {:02X}, Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    STX_z_y:   {:02X}, Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def stX_z(self):
         print("{:04X}  {:02X}{:02X}  STX_z:   {:02X}".format(
@@ -534,44 +684,50 @@ class NESDisassembler(object):
     def stA_I_y(self):
         print("{:04X}  {:02X}{:02X}  STA_I_y:   ({:02X}), Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    STA_I_y:   ({:02X}), Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    STA_I_y:   ({:02X}), Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def stA_I_x(self):
         print("{:04X}  {:02X}{:02X}  STA_I_x: ({:02X}, X)".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    STA_I_x: ({:02X}, X)".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    STA_I_x: ({:02X}, X)".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def stA_a_y(self):
         print("{:04X}  {:02X}{:02X}{:02X}  STA_a_y:  {:02X}{:02X}, Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  STA_a_y: {:02X}{:02X}, Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  STA_a_y: {:02X}{:02X}, Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def stA_a_x(self):
         print("{:04X}  {:02X}{:02X}{:02X}  STA_a_x:  {:02X}{:02X}, X".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  STA_a_x: {:02X}{:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  STA_a_x: {:02X}{:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def stA_a(self):
         print("{:04X}  {:02X}{:02X}{:02X}  STA_a:   #{:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  STA_a:  #{:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  STA_a:  #{:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def stA_z_x(self):
         print("{:04X}  {:02X}{:02X}  STA_z_x:   {:02X}, X".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    STA_z_x:   {:02X}, X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    STA_z_x:   {:02X}, X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def stA_z(self):
         print("{:04X}  {:02X}{:02X}  STA_z:   {:02X}".format(
@@ -595,43 +751,49 @@ class NESDisassembler(object):
         print("{:04X}  {:02X}{:02X}{:02X}  LDA_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte,
             self.thirdbyte, self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  LDA_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte,
-            self.thirdbyte, self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  LDA_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte,
+                                 self.thirdbyte, self.thirdbyte, self.secondbyte))
 
     def ldA_I_x(self):
         print("{:04X}  {:02X}{:02X}  LDA_I_x: ({:02X} + X)".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    LDA_I_x: ({:02X} + X)".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    LDA_I_x: ({:02X} + X)".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def ldA_z_x(self):
         print("{:04X}  {:02X}{:02X}  LDA_z_x: {:02X} + X".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    LDA_z_x: {:02X} + X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    LDA_z_x: {:02X} + X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def ldA_a_x(self):
         print("{:04X}  {:02X}{:02X}{:02X}  LDA_a_x: {:02X}{:02X} + X".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  LDA_a_x: {:02X}{:02X} + X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  LDA_a_x: {:02X}{:02X} + X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def ldA_a_y(self):
         print("{:04X}  {:02X}{:02X}{:02X}  LDA_a_y: {:02X}{:02X} + Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  LDA_a_y: {:02X}{:02X} + Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
-            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  LDA_a_y: {:02X}{:02X} + Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+                                 self.thirdbyte, self.secondbyte))
 
     def ldA_I_y(self):
         print("{:04X}  {:02X}{:02X}  LDA_I_y: ({:02X}) + Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    LDA_I_y: ({:02X}) + Y".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    LDA_I_y: ({:02X}) + Y".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def ldX_i(self):
         print("{:04X}  {:02X}{:02X}  LDX_i:  #{:02X}".format(
@@ -648,24 +810,27 @@ class NESDisassembler(object):
     def ldX_z_x(self):
         print("{:04X}  {:02X}{:02X}  LDX_z_x:   {:02X} + X".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    LDX_z_x:   {:02X} + X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    LDX_z_x:   {:02X} + X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def ldX_a(self):
         print("{:04X}  {:02X}{:02X}{:02X}  LDX_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte,
             self.thirdbyte, self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  LDX_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte,
-            self.thirdbyte, self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  LDX_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte,
+                                 self.thirdbyte, self.thirdbyte, self.secondbyte))
 
     def ldX_a_x(self):
         print("{:04X}  {:02X}{:02X}{:02X}  LDX_a_x: {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte,
             self.thirdbyte, self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  LDX_a_x: {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte,
-            self.thirdbyte, self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  LDX_a_x: {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte,
+                                 self.thirdbyte, self.thirdbyte, self.secondbyte))
 
     def ldY_i(self):
         print("{:04X}  {:02X}{:02X}  LDY_i:  #{:02X}".format(
@@ -683,23 +848,26 @@ class NESDisassembler(object):
         print("{:04X}  {:02X}{:02X}{:02X}  LDY_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte,
             self.thirdbyte, self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  LDY_a:   {:02X}{:02X}".format(
-            self.pc, self.firstbyte, self.secondbyte,
-            self.thirdbyte, self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  LDY_a:   {:02X}{:02X}".format(
+                                 self.pc, self.firstbyte, self.secondbyte,
+                                 self.thirdbyte, self.thirdbyte, self.secondbyte))
 
     def ldY_a_x(self):
         print("{:04X}  {:02X}{:02X}{:02X}  LDY_a_x: {:02X}{:02X} + X".format(
             self.pc, self.firstbyte, self.secondbyte,
             self.thirdbyte, self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  LDY_a_x: {:02X}{:02X} + X".format(
-            self.pc, self.firstbyte, self.secondbyte,
-            self.thirdbyte, self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}"
+                             "  LDY_a_x: {:02X}{:02X} + X".format(
+                                 self.pc, self.firstbyte, self.secondbyte,
+                                 self.thirdbyte, self.thirdbyte, self.secondbyte))
 
     def ldY_z_x(self):
         print("{:04X}  {:02X}{:02X}  LDY_z_x:   {:02X} + X".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}    LDY_z_x:   {:02X} + X".format(
-            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}"
+                             "    LDY_z_x:   {:02X} + X".format(
+                                 self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def disassembler(self, firstbyte, secondbyte, thirdbyte):
         self.firstbyte = firstbyte
@@ -742,9 +910,9 @@ def main():
     for byte in bytes_from_file("SMB.nes"):
         memory.append(hex(byte))
 
-    l = len(memory)
+    length = len(memory)
     dis.pc = 0x0
-    while dis.pc < (l - 2):
+    while dis.pc < (length - 2):
         next_byte = memory[dis.pc + 1]
         next_byte = int(next_byte, 16)
         first_byte = memory[dis.pc]
