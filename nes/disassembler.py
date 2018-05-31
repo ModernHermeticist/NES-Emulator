@@ -107,15 +107,40 @@ class NESDisassembler(object):
                                          self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0x4:
-            print("4 not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}"
-                                 "    4 not handled yet.".format(
+            if self.firstbyte_secondnib == 0x1:
+                self.bitwise_exclusive_or_I_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x5:
+                self.bitwise_exclusive_or_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x9:
+                self.bitwise_exclusive_or_i()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0xD:
+                self.bitwise_exclusive_or_a()
+                self.pc += 3
+            else:
+                print("4 not handled yet.")
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                    "    4 not handled yet.".format(
                                      self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0x5:
             if self.firstbyte_secondnib == 0x0:
                 self.branch_on_overflow_clear()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x1:
+                self.bitwise_exclusive_or_I_y()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x5:
+                self.bitwise_exclusive_or_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x9:
+                self.bitwise_exclusive_or_a_y()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xD:
+                self.bitwise_exclusive_or_a_x()
+                self.pc += 3
             else:
                 print("5 not handled yet.")
                 self.dumplist.append("{:04X}  {:02X}{:02X}"
@@ -310,14 +335,60 @@ class NESDisassembler(object):
                                          self.pc, self.firstbyte, self.secondbyte))
                 self.pc += 2
         if self.firstbyte_firstnib == 0xC:
-            print("C not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}"
-                                 "    C not handled yet.".format(
+            if self.firstbyte_secondnib == 0x9:
+                self.compare_accumulator_i()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x1:
+                self.compare_accumulator_I_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x5:
+                self.compare_accumulator_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x6:
+                self.decrement_memory_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0xD:
+                self.compare_accumulator_a()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xE:
+                self.decrement_memory_a()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0x0:
+                self.compare_y_register_i()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x4:
+                self.compare_y_register_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0xC:
+                self.compare_y_register_a()
+                self.pc += 3
+            else:
+                print("C not handled yet.")
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                    "    C not handled yet.".format(
                                      self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0xD:
             if self.firstbyte_secondnib == 0x0:
                 self.branch_on_not_equal()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x5:
+                self.compare_accumulator_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x6:
+                self.decrement_memory_z_x()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0xD:
+                self.compare_accumulator_a_x()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xE:
+                self.decrement_memory_a_x()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0x9:
+                self.compare_accumulator_a_y()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0x1:
+                self.compare_accumulator_I_y()
                 self.pc += 2
             else:
                 print("D not handled yet.")
@@ -326,9 +397,19 @@ class NESDisassembler(object):
                                          self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0xE:
-            print("E not handled yet.")
-            self.dumplist.append("{:04X}  {:02X}{:02X}"
-                                 "    E not handled yet.".format(
+            if self.firstbyte_secondnib == 0x0:
+                self.compare_x_register_i()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x4:
+                self.compare_x_register_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0xC:
+                self.compare_x_register_a()
+                self.pc += 3
+            else:
+                print("E not handled yet.")
+                self.dumplist.append("{:04X}  {:02X}{:02X}"
+                                    "    E not handled yet.".format(
                                      self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
         if self.firstbyte_firstnib == 0xF:
@@ -341,6 +422,156 @@ class NESDisassembler(object):
                                      "    F not handled yet.".format(
                                          self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
+
+    def bitwise_exclusive_or_I_y(self):
+        print("{:04X}  {:02X}{:02X}    XOR_I_y: ({:02X}), Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    XOR_I_y: ({:02X}), Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def bitwise_exclusive_or_I_x(self):
+        print("{:04X}  {:02X}{:02X}    XOR_I_x: ({:02X}, X)".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    XOR_I_x: ({:02X}, X)".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))   
+
+    def bitwise_exclusive_or_a_y(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  XOR_a_y: {:02X}{:02X}, Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  XOR_a_y: {:02X}{:02X}, Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte)) 
+
+    def bitwise_exclusive_or_a_x(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  XOR_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  XOR_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte)) 
+
+    def bitwise_exclusive_or_a(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  XOR_a:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  XOR_a:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))  
+
+    def bitwise_exclusive_or_z_x(self):
+        print("{:04X}  {:02X}{:02X}    XOR_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    XOR_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))  
+
+    def bitwise_exclusive_or_z(self):
+        print("{:04X}  {:02X}{:02X}    XOR_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    XOR_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))    
+
+    def bitwise_exclusive_or_i(self):
+        print("{:04X}  {:02X}{:02X}    XOR_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    XOR_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))    
+
+    def decrement_memory_a_x(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  DEC_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  DEC_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def decrement_memory_a(self):
+        print("{:04X}  {:02X}{:02X}{:02X}    DEC_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}    DEC_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def decrement_memory_z_x(self):
+        print("{:04X}  {:02X}{:02X}    DEC_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    DEC_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def decrement_memory_z(self):
+        print("{:04X}  {:02X}{:02X}    DEC_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    DEC_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_y_register_a(self):
+        print("{:04X}  {:02X}{:02X}{:02X}    CPY_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}    CPY_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def compare_y_register_z(self):
+        print("{:04X}  {:02X}{:02X}    CPY_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    CPY_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_y_register_i(self):
+        print("{:04X}  {:02X}{:02X}    CPY_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    CPY_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_x_register_a(self):
+        print("{:04X}  {:02X}{:02X}{:02X}    CPX_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}    CPX_a: {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def compare_x_register_z(self):
+        print("{:04X}  {:02X}{:02X}    CPX_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    CPX_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_x_register_i(self):
+        print("{:04X}  {:02X}{:02X}  C  PX_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    CPX_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_accumulator_I_y(self):
+        print("{:04X}  {:02X}{:02X}  CMP_I_y:   ({:02X}), Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}  CMP_I_y:   ({:02X}), Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_accumulator_I_x(self):
+        print("{:04X}  {:02X}{:02X}  CMP_I_x:   ({:02X}, X)".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}  CMP_I_x:   ({:02X}, X)".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def compare_accumulator_a_y(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  CMP_a_y: {:02X}{:02X}, Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  CMP_a_y: {:02X}{:02X}, Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def compare_accumulator_a_x(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  CMP_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  CMP_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
 
     def compare_accumulator_a(self):
         print("{:04X}  {:02X}{:02X}{:02X}  CMP_a: {:02X}{:02X}".format(
@@ -685,7 +916,7 @@ class NESDisassembler(object):
         print("{:04X}  {:02X}{:02X}  STA_I_y:   ({:02X}), Y".format(
             self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
         self.dumplist.append("{:04X}  {:02X}{:02X}"
-                             "    STA_I_y:   ({:02X}), Y".format(
+                             "    STA_I_y: ({:02X}), Y".format(
                                  self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
 
     def stA_I_x(self):
