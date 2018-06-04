@@ -37,6 +37,9 @@ class NESDisassembler(object):
             elif self.firstbyte_secondnib == 0x5:
                 self.bitwise_or_with_accumulator_z()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x8:
+                self.push_processor_status()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0x9:
                 self.bitwise_or_with_accumulator_i()
                 self.pc += 2
@@ -99,11 +102,23 @@ class NESDisassembler(object):
             elif self.firstbyte_secondnib == 0x5:
                 self.and_z()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x6:
+                self.rotate_left_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x8:
+                self.pull_processor_status()
+                self.pc += 1
+            elif self.firstbyte_secondnib == 0xA:
+                self.rotate_left_a()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0xC:
                 self.bit_a()
                 self.pc += 3
             elif self.firstbyte_secondnib == 0xD:
                 self.and_a()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xE:
+                self.rotate_left_A()
                 self.pc += 3
             elif self.firstbyte_secondnib == 0x1:
                 self.and_I_x()
@@ -118,11 +133,17 @@ class NESDisassembler(object):
             if self.firstbyte_secondnib == 0x5:
                 self.and_z_x()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x6:
+                self.rotate_left_z_x()
+                self.pc += 2
             elif self.firstbyte_secondnib == 0x0:
                 self.branch_on_minus()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0xD:
                 self.and_a_x()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xE:
+                self.rotate_left_A_x()
                 self.pc += 3
             elif self.firstbyte_secondnib == 0x9:
                 self.and_a_y()
@@ -143,9 +164,15 @@ class NESDisassembler(object):
             if self.firstbyte_secondnib == 0x1:
                 self.bitwise_exclusive_or_I_x()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x0:
+                self.return_from_interrupt()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0x5:
                 self.bitwise_exclusive_or_z()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x8:
+                self.push_accumulator()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0x9:
                 self.bitwise_exclusive_or_i()
                 self.pc += 2
@@ -190,17 +217,32 @@ class NESDisassembler(object):
             if self.firstbyte_secondnib == 0x9:
                 self.add_with_carry_i()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x0:
+                self.return_from_subroutine()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0x1:
                 self.add_with_carry_I_x()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0x5:
                 self.add_with_carry_z()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x6:
+                self.rotate_right_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x8:
+                self.pull_accumulator()
+                self.pc += 1
+            elif self.firstbyte_secondnib == 0xA:
+                self.rotate_right_a()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0xC:
                 self.jump_I()
                 self.pc += 3
             elif self.firstbyte_secondnib == 0xD:
                 self.add_with_carry_a()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xE:
+                self.rotate_right_A()
                 self.pc += 3
             else:
                 print("6 not handled yet.")
@@ -218,8 +260,14 @@ class NESDisassembler(object):
             elif self.firstbyte_secondnib == 0x1:
                 self.add_with_carry_I_x()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x6:
+                self.rotate_right_z_x()
+                self.pc += 2
             elif self.firstbyte_secondnib == 0xD:
                 self.add_with_carry_a_x()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xE:
+                self.rotate_right_A_x()
                 self.pc += 3
             elif self.firstbyte_secondnib == 0x8:
                 self.set_interrupt()
@@ -246,6 +294,9 @@ class NESDisassembler(object):
             elif self.firstbyte_secondnib == 0x6:
                 self.stX_z()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x8:
+                self.decrement_y()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0xE:
                 self.stX_a()
                 self.pc += 3
@@ -395,6 +446,12 @@ class NESDisassembler(object):
             elif self.firstbyte_secondnib == 0x6:
                 self.decrement_memory_z()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x8:
+                self.increment_y()
+                self.pc += 1
+            elif self.firstbyte_secondnib == 0xA:
+                self.decrement_x()
+                self.pc += 1
             elif self.firstbyte_secondnib == 0xD:
                 self.compare_accumulator_a()
                 self.pc += 3
@@ -451,17 +508,32 @@ class NESDisassembler(object):
             if self.firstbyte_secondnib == 0x0:
                 self.compare_x_register_i()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x1:
+                self.subtract_with_carry_I_x()
+                self.pc += 2
             elif self.firstbyte_secondnib == 0x4:
                 self.compare_x_register_z()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x5:
+                self.subtract_with_carry_z()
+                self.pc += 2
             elif self.firstbyte_secondnib == 0x6:
                 self.increment_memory_z()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x8:
+                self.increment_x()
+                self.pc += 1
+            elif self.firstbyte_secondnib == 0x9:
+                self.subtract_with_carry_i()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0xA:
                 self.no_operation()
                 self.pc += 1
             elif self.firstbyte_secondnib == 0xC:
                 self.compare_x_register_a()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xD:
+                self.subtract_with_carry_a()
                 self.pc += 3
             elif self.firstbyte_secondnib == 0xE:
                 self.increment_memory_a()
@@ -476,12 +548,24 @@ class NESDisassembler(object):
             if self.firstbyte_secondnib == 0x0:
                 self.branch_on_equal()
                 self.pc += 2
+            elif self.firstbyte_secondnib == 0x1:
+                self.subtract_with_carry_I_y()
+                self.pc += 2
+            elif self.firstbyte_secondnib == 0x5:
+                self.subtract_with_carry_z_x()
+                self.pc += 2
             elif self.firstbyte_secondnib == 0x6:
                 self.increment_memory_z_x()
                 self.pc += 2
             elif self.firstbyte_secondnib == 0x8:
                 self.set_decimal()
                 self.pc += 1
+            elif self.firstbyte_secondnib == 0x9:
+                self.subtract_with_carry_a_y()
+                self.pc += 3
+            elif self.firstbyte_secondnib == 0xD:
+                self.subtract_with_carry_a_x()
+                self.pc += 3
             elif self.firstbyte_secondnib == 0xE:
                 self.increment_memory_a_x()
                 self.pc += 3
@@ -491,6 +575,188 @@ class NESDisassembler(object):
                                      "    F not handled yet.".format(
                                          self.pc, self.firstbyte, self.secondbyte))
             self.pc += 2
+
+    def subtract_with_carry_I_y(self):
+        print("{:04X}  {:02X}{:02X}  SBC_I_y: ({:02X}), Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}  SBC_I_y: ({:02X}), Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def subtract_with_carry_I_x(self):
+        print("{:04X}  {:02X}{:02X}  SBC_I_x: ({:02X}, X)".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}  SBC_I_x: ({:02X}, X)".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def subtract_with_carry_a_y(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  SBC_a_y: {:02X}{:02X}, Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  SBC_a_y: {:02X}{:02X}, Y".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def subtract_with_carry_a_x(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  SBC_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  SBC_a_x: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def subtract_with_carry_a(self):
+        print("{:04X}  {:02X}{:02X}{:02X}    SBC_a:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}    SBC_a:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def subtract_with_carry_z_x(self):
+        print("{:04X}  {:02X}{:02X}  SBC_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}  SBC_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def subtract_with_carry_z(self):
+        print("{:04X}  {:02X}{:02X}    SBC_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    SBC_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def subtract_with_carry_i(self):
+        print("{:04X}  {:02X}{:02X}    SBC_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    SBC_i:  #{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def rotate_right_A_x(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  ROR_A: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  ROR_A: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def rotate_left_A_x(self):
+        print("{:04X}  {:02X}{:02X}{:02X}  ROL_A: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  ROL_A: {:02X}{:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def rotate_right_A(self):
+        print("{:04X}  {:02X}{:02X}{:02X}    ROR_A:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}    ROR_A:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def rotate_left_A(self):
+        print("{:04X}  {:02X}{:02X}{:02X}    ROL_A:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}    ROL_A:   {:02X}{:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
+            self.thirdbyte, self.secondbyte))
+
+    def rotate_right_z_x(self):
+        print("{:04X}  {:02X}{:02X}  ROR_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}  ROR_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def rotate_left_z_x(self):
+        print("{:04X}  {:02X}{:02X}    ROL_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    ROL_z_x: {:02X}, X".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def rotate_right_z(self):
+        print("{:04X}  {:02X}{:02X}    ROR_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    ROR_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def rotate_left_z(self):
+        print("{:04X}  {:02X}{:02X}    ROL_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    ROL_z:   {:02X}".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+
+    def rotate_right_a(self):
+        print("{:04X}  {:02X}{:02X}    ROR_a:   A".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    ROR_a:   A".format(
+            self.pc, self.firstbyte, self.secondbyte))
+
+    def rotate_left_a(self):
+        print("{:04X}  {:02X}{:02X}    ROL_a:   A".format(
+            self.pc, self.firstbyte, self.secondbyte, self.secondbyte))
+        self.dumplist.append("{:04X}  {:02X}{:02X}    ROL_a:   A".format(
+            self.pc, self.firstbyte, self.secondbyte))
+
+    def return_from_interrupt(self):
+        print("{:04X}  {:02X} RTI".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      RTI".format(
+            self.pc, self.firstbyte))
+
+    def return_from_subroutine(self):
+        print("{:04X}  {:02X} RTS".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      RTS".format(
+            self.pc, self.firstbyte))
+
+    def pull_processor_status(self):
+        print("{:04X}  {:02X} PLP".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      PLP".format(
+            self.pc, self.firstbyte))
+
+    def push_processor_status(self):
+        print("{:04X}  {:02X} PHP".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      PHP".format(
+            self.pc, self.firstbyte))
+
+    def pull_accumulator(self):
+        print("{:04X}  {:02X} PLA".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      PLA".format(
+            self.pc, self.firstbyte))
+
+    def push_accumulator(self):
+        print("{:04X}  {:02X} PHA".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      PHA".format(
+            self.pc, self.firstbyte))
+
+    def increment_y(self):
+        print("{:04X}  {:02X} INY".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      INY".format(
+            self.pc, self.firstbyte))
+
+    def decrement_y(self):
+        print("{:04X}  {:02X} DEY".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      DEY".format(
+            self.pc, self.firstbyte))
+
+    def increment_x(self):
+        print("{:04X}  {:02X} INX".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      INX".format(
+            self.pc, self.firstbyte))
+
+    def decrement_x(self):
+        print("{:04X}  {:02X} DEX".format(
+            self.pc, self.firstbyte))
+        self.dumplist.append("{:04X}  {:02X}      DEX".format(
+            self.pc, self.firstbyte))
 
     def bitwise_or_with_accumulator_a_y(self):
         print("{:04X}  {:02X}{:02X}{:02X}  INC_a_y: {:02X}{:02X}, Y".format(
@@ -797,10 +1063,10 @@ class NESDisassembler(object):
             self.thirdbyte, self.secondbyte))
 
     def compare_accumulator_a(self):
-        print("{:04X}  {:02X}{:02X}{:02X}  CMP_a: {:02X}{:02X}".format(
+        print("{:04X}  {:02X}{:02X}{:02X}  CMP_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
-        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  CMP_a: {:02X}{:02X}".format(
+        self.dumplist.append("{:04X}  {:02X}{:02X}{:02X}  CMP_a:   {:02X}{:02X}".format(
             self.pc, self.firstbyte, self.secondbyte, self.thirdbyte,
             self.thirdbyte, self.secondbyte))
 
