@@ -15,11 +15,11 @@ def bytes_from_file(filename, chunksize=8192):
 
 def main():
 
-	cpu = CPU()
-	rom = ROM()
+    cpu = CPU()
+    rom = ROM()
 
-
-
+    for byte in bytes_from_file("SMB.nes"):
+        rom.memory.append(hex(byte))
 
 
 if __name__ == "__main__":

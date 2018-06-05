@@ -1,9 +1,8 @@
 
 
-
 class ROM(object):
 
-	def __init__(self):
+    def __init__(self):
 
         self.firstbyte = 0x0
         self.firstbyte_firstnib = 0x0
@@ -17,3 +16,5 @@ class ROM(object):
 
         self.dumplist = []
         self.dumpfile = None
+
+        self.memory = []
