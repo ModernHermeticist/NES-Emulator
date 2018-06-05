@@ -1,24 +1,19 @@
-from typing import List
 
-
-HEADER_SIZE = 16
-KB_SIZE = 1024
 
 
 class ROM(object):
 
-    def __init__(self, rom_bytes: List[int]):
-        # TODO unhardcode, pull from rom header
-        self.num_prg_blocks = 2
+	def __init__(self):
 
-        # program data starts after HEADER_SIZE
-        # and lasts for a set number of 16KB blocks
-        self.data_bytes = rom_bytes[
-            HEADER_SIZE:HEADER_SIZE + (16 * KB_SIZE * self.num_prg_blocks)]
+        self.firstbyte = 0x0
+        self.firstbyte_firstnib = 0x0
+        self.firstbyte_secondnib = 0x0
+        self.secondbyte = 0x0
+        self.secondbyte_firstnib = 0x0
+        self.secondbyte_secondnib = 0x0
+        self.thirdbyte = 0x0
+        self.thirdbyte_firstnib = 0x0
+        self.thirdbyte_secondnib = 0x0
 
-    def get_byte(self, position: int) -> int:
-        """
-        Gets byte at given position
-        :return: int
-        """
-        return self.data_bytes[position]
+        self.dumplist = []
+        self.dumpfile = None

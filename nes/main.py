@@ -1,28 +1,26 @@
-import argparse
-from cpu import CPU
-from rom import ROM
-from instruction import *
+from cpu import *
+from rom import *
+
+
+def bytes_from_file(filename, chunksize=8192):
+    with open(filename, "rb") as f:
+        while True:
+            chunk = f.read(chunksize)
+            if chunk:
+                for b in chunk:
+                    yield b
+            else:
+                break
 
 
 def main():
-    # set up command line argument parser
-    parser = argparse.ArgumentParser(description='NES Emulator')
-    parser.add_argument('rom_path',
-                        metavar='R',
-                        type=str,
-                        help='path to nes rom')
-    args = parser.parse_args()
 
-    # load rom
-    with open(args.rom_path, 'rb') as file:
-        rom_bytes = file.read()
-
-    rom = ROM(list(rom_bytes))
-
-    # create cpu
-    cpu = CPU()
-    cpu.run_rom(rom)
+	cpu = CPU()
+	rom = ROM()
 
 
-if __name__ == '__main__':
+
+
+
+if __name__ == "__main__":
     main()
